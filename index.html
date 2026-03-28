@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studio Calc | Premium</title>
+    <style>
+        :root {
+            --bg-color: #f4ece4;
+            --glass: rgba(255, 255, 255, 0.6);
+            --accent: #d4a373;
+            --dark-accent: #bc8a5f;
+            --text: #4a423d;
+        }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: linear-gradient(135deg, #f4ece4 0%, #e2d1c3 100%);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px 0;
+        }
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 40px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.06);
+        }
+        h1 { font-weight: 300; font-size: 1.6rem; margin-bottom: 1.5rem; text-align: center; letter-spacing: 2px; color: #6b5e54; }
+        
+        .service-block {
+            margin-bottom: 1.2rem;
+            background: rgba(255, 255, 255, 0.4);
+            padding: 18px;
+            border-radius: 24px;
+            border: 1px solid transparent;
+            transition: 0.3s ease;
+        }
+        .active-service { border-color: var(--accent); background: rgba(255, 255, 255, 0.8); }
+
+        .service-header { display: flex; justify-content: space-between; align-items: center; }
+        .service-header label { font-weight: 600; font-size: 1.1rem; cursor: pointer; }
+        
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #d1d1d1; transition: .4s; border-radius: 24px; }
+        input:checked + .slider { background-color: var(--accent); }
+
+        .addon-group { display: none; flex-direction: column; gap: 12px; margin-top: 15px; }
+        .active-service .addon-group { display: flex; }
+        
+        .button-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+
+        .addon-btn {
+            border: 1px solid #e0e0e0; background: white; padding: 10px; border-radius: 12px;
+            font-size: 0.8rem; cursor: pointer; transition: 0.2s; color: var(--text);
+        }
+        .addon-btn.selected { background: var(--accent); color: white; border-color: var(--accent); }
+
+        /* Custom Input Row */
+        .custom-row { display: grid; grid-template-columns: 2fr 1fr; gap: 8px; margin-top: 5px; }
+        .custom-row input { 
+            padding: 10px; border-radius: 10px; border: 1px solid #ddd; 
+            font-size: 0.85rem; background: rgba(255,255,255,0.6); outline: none;
+        }
+
+        .discount-section { margin-top: 2rem; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 1.5rem; }
+        .discount-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .input-box { display: flex; flex-direction: column; gap: 5px; }
+        .input-box label { font-size: 0.7rem; font-weight: 700; opacity: 0.6; letter-spacing: 1px; }
+        .input-box input { padding: 12px; border-radius: 12px; border: 1px solid #ddd; font-size: 1rem; background: white; }
+
+        .result-panel {
+            background: #3e3834; color: white; border-radius: 24px; padding: 25px;
+            margin-top: 2rem; text-align: center;
+        }
+        #total-display { font-size: 2.8rem; display: block; font-weight: 700; margin-top: 5px; }
+
+        .btn-reset {
+            width: 100%; border: none; background: transparent; color: var(--text);
+            padding: 15px; margin-top: 10px; cursor: pointer; font-size: 0.85rem; text-decoration: underline; opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>STUDIO CALC</h1>
+
+    <div class="service-block" id="block-hand">
+        <div class="service-header">
+            <label for="check-hand">Hand ($338)</label>
+            <label class="switch"><input type="checkbox" id="check-hand" onchange="updateUI()"><span class="slider"></span></label>
+        </div>
+        <div class="addon-group">
+            <div class="button-row">
+                <button class="addon-btn" onclick="toggleAddon(this)">French $150</button>
+                <button class="addon-btn" onclick="toggleAddon(this)">漸變 $120</button>
+                <button class="addon-btn" onclick="toggleAddon(this)">+C $50</button>
+            </div>
+            <div class="custom-row">
+                <input type="text" placeholder="Custom Hand Service" id="custom-hand-name">
+                <input type="number" placeholder="$0" id="custom-hand-price" oninput="updateUI()">
+            </div>
+        </div>
+    </div>
+
+    <div class="service-block" id="block-feet">
+        <div class="service-header">
+            <label for="check-feet">Feet ($388)</label>
+            <label class="switch"><input type="checkbox" id="check-feet" onchange="updateUI()"><span class="slider"></span></label>
+        </div>
+        <div class="addon-group">
+            <div class="button-row">
+                <button class="addon-btn" onclick="toggleAddon(this)">+A $30</button>
+                <button class="addon-btn" onclick="toggleAddon(this)">+B $20</button>
+                <button class="addon-btn" onclick="toggleAddon(this)">+C $50</button>
+            </div>
+            <div class="custom-row">
+                <input type="text" placeholder="Custom Feet Service" id="custom-feet-name">
+                <input type="number" placeholder="$0" id="custom-feet-price" oninput="updateUI()">
+            </div>
+        </div>
+    </div>
+
+    <div class="service-block" id="block-lash">
+        <div class="service-header">
+            <label for="check-lash">Lash ($408)</label>
+            <label class="switch"><input type="checkbox" id="check-lash" onchange="updateUI()"><span class="slider"></span></label>
+        </div>
+        <div class="addon-group">
+            <div class="button-row">
+                <button class="addon-btn" onclick="toggleAddon(this)">+A $30</button>
+                <button class="addon-btn" onclick="toggleAddon(this)">+B $20</button>
+                <button class="addon-btn" onclick="toggleAddon(this)">+C $50</button>
+            </div>
+            <div class="custom-row">
+                <input type="text" placeholder="Custom Lash Service" id="custom-lash-name">
+                <input type="number" placeholder="$0" id="custom-lash-price" oninput="updateUI()">
+            </div>
+        </div>
+    </div>
+
+    <div class="discount-section">
+        <div class="discount-grid">
+            <div class="input-box"><label>DISCOUNT %</label><input type="number" id="disc-percent" placeholder="0" oninput="updateUI()"></div>
+            <div class="input-box"><label>DISCOUNT $</label><input type="number" id="disc-cash" placeholder="0" oninput="updateUI()"></div>
+        </div>
+    </div>
+
+    <div class="result-panel">
+        <span style="font-size: 0.8rem; opacity: 0.7; text-transform: uppercase;">Final Fee</span>
+        <span id="total-display">$0</span>
+    </div>
+
+    <button class="btn-reset" onclick="resetAll()">Reset All</button>
+</div>
+
+<script>
+    function updateUI() {
+        const services = [
+            { id: 'hand', base: 338 },
+            { id: 'feet', base: 388 },
+            { id: 'lash', base: 408 }
+        ];
+
+        let subtotal = 0;
+
+        services.forEach(s => {
+            const isChecked = document.getElementById('check-' + s.id).checked;
+            const block = document.getElementById('block-' + s.id);
+            
+            if (isChecked) {
+                block.classList.add('active-service');
+                subtotal += s.base;
+                
+                // Addon Buttons
+                block.querySelectorAll('.addon-btn.selected').forEach(btn => {
+                    subtotal += parseInt(btn.innerText.match(/\d+/)[0]);
+                });
+
+                // Custom Input Field for this section
+                const customPrice = parseFloat(document.getElementById(`custom-${s.id}-price`).value) || 0;
+                subtotal += customPrice;
+
+            } else {
+                block.classList.remove('active-service');
+            }
+        });
+
+        const dPercent = parseFloat(document.getElementById('disc-percent').value) || 0;
+        const dCash = parseFloat(document.getElementById('disc-cash').value) || 0;
+
+        let finalTotal = subtotal * (1 - (dPercent / 100)) - dCash;
+        if (finalTotal < 0) finalTotal = 0;
+
+        document.getElementById('total-display').innerText = '$' + Math.round(finalTotal);
+    }
+
+    function toggleAddon(btn) {
+        btn.classList.toggle('selected');
+        updateUI();
+    }
+
+    function resetAll() {
+        document.querySelectorAll('input[type=checkbox]').forEach(el => el.checked = false);
+        document.querySelectorAll('.addon-btn').forEach(el => el.classList.remove('selected'));
+        document.querySelectorAll('input[type=number], input[type=text]').forEach(el => el.value = '');
+        updateUI();
+    }
+</script>
+
+</body>
+</html>

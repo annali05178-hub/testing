@@ -1,0 +1,165 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2639
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww28300\viewh17700\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 <!DOCTYPE html>\
+<html lang="en">\
+<head>\
+    <meta charset="UTF-8">\
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">\
+    <title>Studio Fee Calculator</title>\
+    <style>\
+        :root \{\
+            --primary: #f8bbd0;\
+            --dark: #4a148c;\
+            --accent: #ad1457;\
+        \}\
+        body \{\
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;\
+            background-color: #fdf2f8;\
+            color: #333;\
+            display: flex;\
+            justify-content: center;\
+            padding: 20px;\
+        \}\
+        .container \{\
+            background: white;\
+            padding: 2rem;\
+            border-radius: 20px;\
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);\
+            max-width: 500px;\
+            width: 100%;\
+        \}\
+        h1 \{ text-align: center; color: var(--dark); margin-bottom: 1.5rem; \}\
+        .section \{\
+            border: 2px solid #fce4ec;\
+            border-radius: 12px;\
+            padding: 15px;\
+            margin-bottom: 1rem;\
+        \}\
+        .section-title \{\
+            font-weight: bold;\
+            display: flex;\
+            justify-content: space-between;\
+            margin-bottom: 10px;\
+            color: var(--accent);\
+        \}\
+        .options \{ display: flex; gap: 10px; \}\
+        .option-btn \{\
+            flex: 1;\
+            padding: 10px;\
+            border: 1px solid #ddd;\
+            border-radius: 8px;\
+            background: #fff;\
+            cursor: pointer;\
+            transition: 0.2s;\
+        \}\
+        .option-btn.active \{\
+            background: var(--primary);\
+            border-color: var(--accent);\
+            font-weight: bold;\
+        \}\
+        .total-box \{\
+            background: var(--dark);\
+            color: white;\
+            padding: 20px;\
+            border-radius: 12px;\
+            text-align: center;\
+            margin-top: 20px;\
+        \}\
+        #total-price \{ font-size: 2.5rem; display: block; \}\
+        button.reset \{\
+            width: 100%;\
+            margin-top: 15px;\
+            padding: 10px;\
+            border: none;\
+            background: #eee;\
+            border-radius: 8px;\
+            cursor: pointer;\
+        \}\
+    </style>\
+</head>\
+<body>\
+\
+<div class="container">\
+    <h1>Studio Calculator</h1>\
+\
+    <div class="section" id="hand-section">\
+        <div class="section-title">Hand <span>$338</span></div>\
+        <div class="options">\
+            <button class="option-btn" onclick="toggle(this, 30)">+A ($30)</button>\
+            <button class="option-btn" onclick="toggle(this, 20)">+B ($20)</button>\
+            <button class="option-btn" onclick="toggle(this, 50)">+C ($50)</button>\
+        </div>\
+    </div>\
+\
+    <div class="section" id="feet-section">\
+        <div class="section-title">Feet <span>$388</span></div>\
+        <div class="options">\
+            <button class="option-btn" onclick="toggle(this, 30)">+A ($30)</button>\
+            <button class="option-btn" onclick="toggle(this, 20)">+B ($20)</button>\
+            <button class="option-btn" onclick="toggle(this, 50)">+C ($50)</button>\
+        </div>\
+    </div>\
+\
+    <div class="section" id="lash-section">\
+        <div class="section-title">Lash <span>$408</span></div>\
+        <div class="options">\
+            <button class="option-btn" onclick="toggle(this, 30)">+A ($30)</button>\
+            <button class="option-btn" onclick="toggle(this, 20)">+B ($20)</button>\
+            <button class="option-btn" onclick="toggle(this, 50)">+C ($50)</button>\
+        </div>\
+    </div>\
+\
+    <div class="total-box">\
+        Total Fee\
+        <span id="total-price">$0</span>\
+    </div>\
+\
+    <button class="reset" onclick="resetAll()">Clear All</button>\
+</div>\
+\
+<script>\
+    let activeAddons = 0;\
+\
+    function calculate() \{\
+        let total = 0;\
+        \
+        // Check which sections have active buttons\
+        const sections = [\
+            \{ id: 'hand-section', base: 338 \},\
+            \{ id: 'feet-section', base: 388 \},\
+            \{ id: 'lash-section', base: 408 \}\
+        ];\
+\
+        sections.forEach(sec => \{\
+            const buttons = document.querySelectorAll(`#$\{sec.id\} .option-btn.active`);\
+            if (buttons.length > 0) \{\
+                total += sec.base; // Add base price if at least one addon is selected\
+                buttons.forEach(btn => \{\
+                    // Extract price from the onclick function value\
+                    const price = parseInt(btn.getAttribute('onclick').match(/\\d+/)[0]);\
+                    total += price;\
+                \});\
+            \}\
+        \});\
+\
+        document.getElementById('total-price').innerText = '$' + total;\
+    \}\
+\
+    function toggle(btn, price) \{\
+        btn.classList.toggle('active');\
+        calculate();\
+    \}\
+\
+    function resetAll() \{\
+        document.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('active'));\
+        calculate();\
+    \}\
+</script>\
+\
+</body>\
+</html>}

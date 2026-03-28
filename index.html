@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Studio Calc | Pro</title>
+    <style>
+        :root { 
+            --glass: rgba(255, 255, 255, 0.7); 
+            --accent: #d4a373; 
+            --text: #4a423d; 
+            --dark: #3e3834;
+        }
+        
+        /* THE FIX: Force everything to stay within its container */
+        * { box-sizing: border-box; }
+        
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            background: linear-gradient(135deg, #f4ece4 0%, #e2d1c3 100%); 
+            color: var(--text); 
+            display: flex; 
+            justify-content: center; 
+            min-height: 100vh; 
+            margin: 0; 
+            padding: 15px; /* Added breathing room for mobile */
+        }
+
+        .card { 
+            background: var(--glass); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255, 255, 255, 0.4); 
+            border-radius: 30px; 
+            padding: 1.5rem; 
+            width: 100%; 
+            max-width: 420px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.06); 
+        }
+
+        h1 { font-weight: 300; font-size: 1.4rem; text-align: center; margin-bottom: 1.2rem; letter-spacing: 2px; }
+        
+        .info-section { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+            margin-bottom: 1.2rem; 
+        }
+
+        /* Responsive Input Styling */
+        input { 
+            width: 100%; 
+            padding: 12px; 
+            border-radius: 12px; 
+            border: 1px solid #ddd; 
+            font-size: 1rem; 
+            background: white; 
+            outline: none;
+            -webkit-appearance: none; /* Fixes iOS input styling */
+        }
+
+        .service-block { 
+            margin-bottom: 0.8rem; 
+            background: rgba(255, 255, 255, 0.4); 
+            padding: 12px; 
+            border-radius: 20px; 
+            border: 1px solid transparent; 
+        }
+        .active-service { border-color: var(--accent); background: rgba(255, 255, 255, 0.8); }
+
+        .service-header { display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 0.95rem; }
+        
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #d1d1d1; transition: .4s; border-radius: 24px; }
+        input:checked + .slider { background-color: var(--accent); }
+
+        .addon-group { display: none; flex-direction: column; gap: 8px; margin-top: 12px; }
+        .active-service .addon-group { display: flex; }
+        
+        .button-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+        .addon-btn { 
+            border: 1px solid #e0e0e0; 
+            background: white; 
+            padding: 10px 2px; 
+            border-radius: 10px; 
+            font-size: 0.7rem; 
+            cursor: pointer; 
+            color: var(--text); 
+        }
+        .addon-btn.selected { background: var(--accent); color: white; border-color: var(--accent); }
+        
+        /* THE FIX: Custom Row layout that prevents bleeding */
+        .custom-row { 
+            display: flex; 
+            gap: 8px; 
+            margin-top: 5px; 
+            width: 100%; 
+        }
+        .custom-row input[type="text"] { flex: 2; min-width: 0; }
+        .custom-row input[type="number"] { flex: 1; min-width: 0; }
+
+        .discount-grid { display: flex; gap: 10px; margin-top: 1rem; }
+        .discount-grid div { flex: 1; min-width: 0; }
+        .discount-grid label { font-size: 0.65rem; font-weight: bold; margin-bottom: 4px; display: block; opacity: 0.7; }
+
+        .result-panel { background: var(--dark); color: white; border-radius: 24px; padding: 20px; margin-top: 1.2rem; text-align: center; }
+        .result-panel span { font-size: 0.75rem; opacity: 0.8; letter-spacing: 1px; }
+        #total-display { font-size: 2.4rem; display: block; font-weight: 700; margin-top: 4px; }
+        
+        .btn-copy { 
+            width: 100%; border: none; background: var(--accent); color: white; 
+            padding: 15px; border-radius: 15px; cursor: pointer; font-weight: 600; 
+            font-size: 1rem; margin-top: 12px;
+        }
+        
+        .btn-reset { 
+            width: 100%; border: none; background: transparent; 
+            padding: 10px; cursor: pointer; font-size: 0.8rem; 
+            text-decoration: underline; opacity: 0.5; color: var(--text); 
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>STUDIO CALC</h1>
+
+    <div class="info-section">
+        <input type="text" id="cust-name" placeholder="Customer Name">
+        <input type="tel" id="cust-phone" placeholder="Phone Number">
+    </div>
+
+    <div class="service-block" id="block-hand">
+        <div class="service-header">
+            <label>Hand ($338)</label>
+            <label class="switch"><input type="checkbox" id="check-hand" onchange="updateUI()"><span class="slider"></span></label>
+        </div>
+        <div class="addon-group">
+            <div class="button-row">
+                <button class="addon-btn" onclick="toggleAddon(this)">French $150</button>
+                <button class="addon-btn" onclick="toggleAddon(this)">漸變 $120</button>
+                <button class="addon-btn" onclick="toggleAddon(this)">+C $50</button>
+            </div>
+            <div class="custom-row">
+                <input type="text" placeholder="Custom Hand" id="custom-hand-name">
+                <input type="number" placeholder="$" id="custom-hand-price" oninput="updateUI()">
+            </div>
+        </div>
+    </div>
+
+    <div class="service-block" id="block-feet">
+        <div class="service-header">
+            <label>Feet ($388)</label>
+            <label class="switch"><input type="checkbox" id="check-feet" onchange="updateUI()"><span class="slider"></span></label>
+        </div>
+        <div class="addon-group">
+            <div class="button-row">
+                <button class="addon-btn" onclick="toggleAddon(this)">+A $30</button>
+                <button class="addon-btn" onclick="toggleAddon(this)">+B $20</button>
+                <button class="addon-btn" onclick="toggleAddon(this)">+C $50</button>
+            </div>
+            <div class="custom-row">
+                <input type="text" placeholder="Custom Feet" id="custom-feet-name">
+                <input type="number" placeholder="$" id="custom-feet-price" oninput="updateUI()">
+            </div>
+        </div>
+    </div>
+
+    <div class="service-block" id="block-lash">
+        <div class="service-header">
+            <label>Lash ($408)</label>
+            <label class="switch"><input type="checkbox" id="check-lash" onchange="updateUI()"><span class="slider"></span></label>
+        </div>
+        <div class="addon-group">
+            <div class="button-row">
+                <button class="addon-btn" onclick="toggleAddon(this)">+A $30</button>
+                <button class="addon-btn" onclick="toggleAddon(this)">+B $20</button>
+                <button class="addon-btn" onclick="toggleAddon(this)">+C $50</button>
+            </div>
+            <div class="custom-row">
+                <input type="text" placeholder="Custom Lash" id="custom-lash-name">
+                <input type="number" placeholder="$" id="custom-lash-price" oninput="updateUI()">
+            </div>
+        </div>
+    </div>
+
+    <div class="discount-grid">
+        <div><label>DISCOUNT %</label><input type="number" id="disc-percent" placeholder="0" oninput="updateUI()"></div>
+        <div><label>DISCOUNT $</label><input type="number" id="disc-cash" placeholder="0" oninput="updateUI()"></div>
+    </div>
+
+    <div class="result-panel">
+        <span>FINAL TOTAL FEE</span>
+        <span id="total-display">$0</span>
+    </div>
+
+    <button class="btn-copy" onclick="copySummary()">📋 Copy Summary</button>
+    <button class="btn-reset" onclick="resetAll()">Reset All</button>
+</div>
+
+<script>
+    function updateUI() {
+        const services = [{id:'hand',base:338},{id:'feet',base:388},{id:'lash',base:408}];
+        let subtotal = 0;
+
+        services.forEach(s => {
+            const isChecked = document.getElementById('check-'+s.id).checked;
+            const block = document.getElementById('block-'+s.id);
+            if (isChecked) {
+                block.classList.add('active-service');
+                subtotal += s.base;
+                block.querySelectorAll('.addon-btn.selected').forEach(btn => {
+                    subtotal += parseInt(btn.innerText.match(/\d+/)[0]);
+                });
+                subtotal += parseFloat(document.getElementById(`custom-${s.id}-price`).value) || 0;
+            } else {
+                block.classList.remove('active-service');
+            }
+        });
+
+        const dP = parseFloat(document.getElementById('disc-percent').value) || 0;
+        const dC = parseFloat(document.getElementById('disc-cash').value) || 0;
+        let final = subtotal * (1 - (dP / 100)) - dC;
+        document.getElementById('total-display').innerText = '$' + Math.round(Math.max(0, final));
+    }
+
+    function toggleAddon(btn) {
+        btn.classList.toggle('selected');
+        updateUI();
+    }
+
+    function resetAll() {
+        document.querySelectorAll('input').forEach(el => el.value = '');
+        document.querySelectorAll('input[type=checkbox]').forEach(el => el.checked = false);
+        document.querySelectorAll('.addon-btn').forEach(el => el.classList.remove('selected'));
+        updateUI();
+    }
+
+    function copySummary() {
+        const now = new Date();
+        const timestamp = now.toLocaleString('en-HK', { hour12: true }); 
+        const name = document.getElementById('cust-name').value || "Guest";
+        const phone = document.getElementById('cust-phone').value || "None";
+        
+        let text = `✨ STUDIO RECEIPT ✨\n`;
+        text += `--------------------------\n`;
+        text += `Date/Time: ${timestamp}\n`;
+        text += `Customer: ${name}\n`;
+        text += `Phone: ${phone}\n`;
+        text += `--------------------------\n`;
+
+        const services = [{id:'hand',name:'Hand',base:338},{id:'feet',name:'Feet',base:388},{id:'lash',name:'Lash',base:408}];
+        let hasService = false;
+
+        services.forEach(s => {
+            if (document.getElementById('check-'+s.id).checked) {
+                hasService = true;
+                text += `• ${s.name}: $${s.base}\n`;
+                document.getElementById('block-'+s.id).querySelectorAll('.addon-btn.selected').forEach(btn => {
+                    text += `  + ${btn.innerText}\n`;
+                });
+                const cp = parseFloat(document.getElementById(`custom-${s.id}-price`).value) || 0;
+                const cn = document.getElementById(`custom-${s.id}-name`).value || "Custom Service";
+                if(cp > 0) text += `  + ${cn}: $${cp}\n`;
+            }
+        });
+
+        if (!hasService) return alert("Select a service first!");
+
+        const dP = document.getElementById('disc-percent').value || 0;
+        const dC = document.getElementById('disc-cash').value || 0;
+        text += `--------------------------\n`;
+        if (dP > 0 || dC > 0) text += `Discount: ${dP}% / -$${dC}\n`;
+        text += `TOTAL: ${document.getElementById('total-display').innerText}\n`;
+        text += `--------------------------\n`;
+        text += `Thank you! 🌸`;
+
+        navigator.clipboard.writeText(text).then(() => alert("Summary Copied!"));
+    }
+</script>
+
+</body>
+</html>
